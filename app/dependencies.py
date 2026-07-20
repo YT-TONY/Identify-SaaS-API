@@ -36,5 +36,10 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
             "role": role,
             "email": email
         }
-    except JWTError:
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Your session has expired. Please log in again."
+        )
+    except jwt.InvalidTokenError:
         raise credentials_exception
