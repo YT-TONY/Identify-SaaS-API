@@ -1,28 +1,28 @@
 import os
 from urllib.parse import quote_plus
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, declarative_base
+from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import sessionmaker
+from dotenv import load_dotenv
 
-# 1. Define your database connection URL
+# Load the environment variables from your .env file
+load_dotenv()
 
-raw_password = "Warlord@2208"
-safe_password = quote_plus(raw_password)  # URL encode the '@' character
-DATABASE_URL = os.getenv(
-    "DATABASE_URL", 
-    f"postgresql://postgres:{safe_password}@localhost:5432/identify_lms"
-)
+# 1. Grab the Database URL from the environment
+DATABASE_URL = os.getenv("DATABASE_URL")
 
-# 2. Create the SQLAlchemy Engine (the actual bridge to the database)
+# Fallback in case your .env file isn't loaded or doesn't have DATABASE_URL
+if not DATABASE_URL:
+    raw_password = "Warlord@2208"
+    safe_password = quote_plus(raw_password)
+    DATABASE_URL = f"postgresql://postgres:{safe_password}@localhost:5432/identify_lms"
+
+# 2. Database engine and session setup
 engine = create_engine(DATABASE_URL)
-
-# 3. Create a Session factory (creates temporary conversations with the DB)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-# 4. Create the Base class that our models (Tenants, Users) will inherit from
 Base = declarative_base()
 
-# 5. Database Dependency (Crucial for FastAPI)
-# This opens a connection when a user visits a page and closes it automatically when they leave.
+# 3. Dependency to get DB session
 def get_db():
     db = SessionLocal()
     try:

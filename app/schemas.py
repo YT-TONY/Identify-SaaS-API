@@ -21,6 +21,21 @@ class TenantOnboardingRequest(BaseModel):
 
 # Add this to the bottom of app/schemas.py
 class UserLoginRequest(BaseModel):
-    tenant_slug: str = Field(..., example="davecode")
     email: EmailStr = Field(..., example="admin@davecode.com")
     password: str = Field(..., min_length=6)
+     
+# --- COURSE SCHEMAS ---
+
+class CourseCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+
+class CourseResponse(BaseModel):
+    id: int
+    title: str
+    description: Optional[str]
+    is_published: bool
+    tenant_id: int
+
+    class Config:
+        from_attributes = True
