@@ -67,12 +67,14 @@ def login(
     }
     access_token = create_access_token(data=token_data)
 
+   # inside app/routers/auth.py login endpoint:
     return {
         "access_token": access_token,
         "token_type": "bearer",
-        "tenant_branding": {
+        "tenant_config": {
             "school_name": tenant.name, 
             "primary_color": tenant.primary_color,
-            "logo_url": getattr(tenant, "logo_url", None)
+            "secondary_color": tenant.secondary_color,
+            "features": tenant.features  
         }
     }

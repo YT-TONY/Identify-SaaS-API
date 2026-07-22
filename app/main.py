@@ -3,16 +3,12 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.database import engine, Base
 import app.config as config
 
-# Import modularized routers
-from app.routers import auth, users, courses
-from app.routers import auth, users, courses, enrollments
+from app.routers import auth, tenants, users, courses, enrollments, progress, qa
 
-# Ensure database tables exist
 Base.metadata.create_all(bind=engine)
 
-app = FastAPI(title="White-Label LMS Core API")
+app = FastAPI(title="White-Label SaaS Core Engine")
 
-# Add CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=config.ALLOWED_ORIGINS,
@@ -21,15 +17,14 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-
-
 app.include_router(auth.router)
 app.include_router(users.router)
 app.include_router(courses.router)
-app.include_router(enrollments.router) # 👈 Add this line!
+app.include_router(enrollments.router)
+app.include_router(progress.router)
+app.include_router(qa.router)
+app.include_router(tenants.router)
 
 @app.get("/")
 def health_check():
-    return {"status": "online", "message": "White-Label LMS Core API is up and running!"}
+    return {"status": "online", "message": "Multi-Tenant SaaS Engine running cleanly!"}
